@@ -18,7 +18,7 @@ func createForm(forms []Form) map[string]string {
 	for _, form := range forms {
 		fmt.Print(form.prompt)
 		nominal, _ := reader.ReadString('\n')
-		body[form.name] = strings.Trim(nominal, "\n")
+		body[form.name] = strings.Trim(nominal, "\n\r")
 	}
 
 	return body

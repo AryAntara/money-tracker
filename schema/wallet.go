@@ -9,7 +9,7 @@ import (
 
 var WalletSchema = `
 CREATE TABLE IF NOT EXISTS wallet (
-	wallet_id    INTEGER PRIMARY KEY,
+	wallet_id    INTEGER PRIMARY KEY AUTO_INCREMENT,
     income INT(11)  DEFAULT 0,
     outcome  INT(11)  DEFAULT 0,
 	title   VARCHAR(250) DEFAULT '',
@@ -52,7 +52,7 @@ func (w *WalletRepository) Save() {
 		createdAt = time.Now().Format("2006-01-02 15:04:05")
 	}
 
-	query := "INSERT INTO wallet (income, outcome, title, created_at) VALUES ($1, $2, $3, $4)"
+	query := "INSERT INTO wallet (income, outcome, title, created_at) VALUES (?, ?, ?, ?)"
 
 	tx := w.DB.MustBegin()
 	tx.MustExec(query, income, outcome, title, createdAt)

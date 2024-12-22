@@ -3,16 +3,17 @@ package config
 import (
 	"log"
 	"money-tracker/schema"
+	"os"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 func NewDatabase() Database {
-	driverName := "sqlite3"
-	dbName := "source.db"
-
-	db, err := sqlx.Connect(driverName, dbName)
+	driverName := "mysql"
+	// dbName := "source.db"
+	dsn := os.Getenv("DSN")
+	db, err := sqlx.Connect(driverName, dsn)
 	if err != nil {
 		log.Fatalf("Cannot connect into database : %v", err)
 	}

@@ -10,12 +10,14 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+	"gopkg.in/telebot.v4"
 )
 
 func NewUpdateExecutor() *config.Executor {
 	return &config.Executor{
-		Cmd:     "update",
-		Handler: updateHandler,
+		Cmd:        "update",
+		Handler:    updateHandler,
+		BotHandler: updateBotHandler,
 	}
 }
 
@@ -90,4 +92,8 @@ func updateHandler(db *sqlx.DB, flag *config.CommandFlag) {
 		}
 	}
 	walletRepository.Update()
+}
+
+func updateBotHandler(db *sqlx.DB, flag *config.CommandFlag, c telebot.Context) error {
+	return c.Send("Insert")
 }

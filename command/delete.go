@@ -7,16 +7,18 @@ import (
 	"money-tracker/schema"
 
 	"github.com/jmoiron/sqlx"
+	"gopkg.in/telebot.v4"
 )
 
 func NewDeleteExecutor() *config.Executor {
 	return &config.Executor{
-		Cmd:     "delete",
-		Handler: deleteHandler,
+		Cmd:        "delete",
+		Handler:    deleteHandler,
+		BotHandler: deleteBotHandler,
 	}
 }
 
-func deleteHandler(db *sqlx.DB, flag *config.CommandFlag) {
+func generateDeleteForm(db *sqlx.DB) string {
 	walletRepository := schema.NewWalletRepository(db)
 	wallets := walletRepository.Get()
 
@@ -28,6 +30,13 @@ func deleteHandler(db *sqlx.DB, flag *config.CommandFlag) {
 	}
 
 	prompt += "Pilih salah satu yang akan dihapus : "
+	return prompt
+}
+func deleteHandler(db *sqlx.DB, flag *config.CommandFlag) {
+
+	walletRepository := schema.NewWalletRepository(db)
+
+	prompt := generateDeleteForm(db)
 	form := createForm([]Form{{
 		prompt,
 		"id",
@@ -56,4 +65,12 @@ func deleteHandler(db *sqlx.DB, flag *config.CommandFlag) {
 	} else {
 		fmt.Println("Tidak jadi.")
 	}
+}
+
+func deleteBotHandler(db *sqlx.DB, flag *config.CommandFlag, c telebot.Context) error {
+	prompt := generateDeleteForm(db)
+	return c.Send(prompt, &telebot.SendOptions{
+		ParseMode: telebot.ModeMarkdown,
+	})
+
 }

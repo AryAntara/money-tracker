@@ -40,6 +40,10 @@ func main() {
 
 	flag := config.NewCommandFlag(args)
 
+	if flag.IsPresent("-t") {
+		config.NewTelegramBot(commands, db.Sqlx)
+	}
+
 	for _, command := range commands {
 		if cmd == command.Cmd {
 			command.Handler(db.Sqlx, flag)

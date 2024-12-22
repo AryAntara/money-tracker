@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+	"gopkg.in/telebot.v4"
 )
 
 type analyticItem struct {
@@ -17,8 +18,9 @@ type analyticItem struct {
 
 func NewAnalyticExecutor() *config.Executor {
 	return &config.Executor{
-		Cmd:     "analytic",
-		Handler: analyticHandler,
+		Cmd:        "analytic",
+		Handler:    analyticHandler,
+		BotHandler: analyticBotHandler,
 	}
 }
 
@@ -68,4 +70,8 @@ func analyze(wallets []schema.Wallet) map[string]string {
 		"total_buy_from_online":         fmt.Sprintf("%d Unit", totalBuyFromOnline),
 		"total_nominal_buy_from_online": helper.FormatThousand(totalNominalBuyFromOnline),
 	}
+}
+
+func analyticBotHandler(db *sqlx.DB, flag *config.CommandFlag, c telebot.Context) error {
+	return c.Send("Insert")
 }

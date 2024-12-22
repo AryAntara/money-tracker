@@ -22,6 +22,14 @@ func (c *CommandFlag) ParseArgs() {
 	c.source = flags
 }
 
+func (c CommandFlag) ValueOn(index int32) string {
+	if len(c.Args) > int(index) {
+		return c.Args[index]
+	}
+
+	return ""
+}
+
 func (c CommandFlag) GetValue(key string) string {
 	if c.IsPresent(key) {
 		return c.source[key]

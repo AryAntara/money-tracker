@@ -8,25 +8,31 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"gopkg.in/telebot.v4"
 )
 
 func NewSeeExecutor() *config.Executor {
 	return &config.Executor{
-		Cmd:     "see",
-		Handler: SeeHandler,
+		Cmd:        "see",
+		Handler:    SeeHandler,
+		BotHandler: seeBotHandler,
 	}
 }
 
-func SeeHandler(db *sqlx.DB, flag *config.CommandFlag) {
+func generateView(db *sqlx.DB, flag *config.CommandFlag) string {
 	walletRepository := schema.NewWalletRepository(db)
 	wallets := walletRepository.Get()
 
 	var incomeTotal int32 = 0
 	var outcomeTotal int32 = 0
+	var daily string
+
 	for i, wallet := range wallets {
+		fmt.Println(wallet)
 		i++
-		date, _ := time.Parse(time.RFC3339, wallet.CreatedAt)
-		fmt.Printf("%d. (%s) %s +%s -%s\n", i, date.Format("2006-01-02"), wallet.Title,
+		date, _ := time.Parse(time.DateTime, wallet.CreatedAt)
+
+		daily += fmt.Sprintf("%d. (%s) %s +%s -%s\n", i, date.Format("2006-01-02"), wallet.Title,
 			helper.FormatThousand(wallet.Income),
 			helper.FormatThousand(wallet.Outcome))
 
@@ -34,10 +40,19 @@ func SeeHandler(db *sqlx.DB, flag *config.CommandFlag) {
 		outcomeTotal += wallet.Outcome
 	}
 
-	fmt.Printf("Total Income \t: %s\nTotal Outcome\t: %s\nTotal\t\t: %s\n",
+	return daily + fmt.Sprintf("Total Income \t: %s\nTotal Outcome\t: %s\nTotal\t\t: %s\n",
 		helper.FormatThousand(incomeTotal),
 		helper.FormatThousand(outcomeTotal),
-		helper.FormatThousand((incomeTotal - outcomeTotal)),
+		helper.FormatThousand((incomeTotal-outcomeTotal)),
 	)
 
+}
+func SeeHandler(db *sqlx.DB, flag *config.CommandFlag) {
+	fmt.Println(generateView(db, flag))
+}
+
+func seeBotHandler(db *sqlx.DB, flag *config.CommandFlag, c telebot.Context) error {
+	return c.Send(fmt.Sprintf("```\n%s```", generateView(db, flag)), &telebot.SendOptions{
+		ParseMode: telebot.ModeMarkdown,
+	})
 }

@@ -28,7 +28,6 @@ func generateView(db *sqlx.DB, flag *config.CommandFlag) string {
 	var daily string
 
 	for i, wallet := range wallets {
-		fmt.Println(wallet)
 		i++
 		date, _ := time.Parse(time.DateTime, wallet.CreatedAt)
 
